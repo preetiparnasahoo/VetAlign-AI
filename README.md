@@ -47,6 +47,9 @@ mkdir -p .streamlit && echo 'GEMINI_API_KEY = "your-key"' > .streamlit/secrets.t
 ```
 
 `.streamlit/secrets.toml` is git-ignored. Never commit a key.
+Credentials are server-only: configure `GEMINI_API_KEY` in Streamlit secrets or
+as an environment variable. The UI has no API-key input, reveal control or
+per-session key override.
 
 ## Deploy (Streamlit Community Cloud, free)
 

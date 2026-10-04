@@ -58,9 +58,9 @@ DEFAULTS = dict(
     extracted_background=None, selected_job=None,
 )
 
-# Credentials live outside DEFAULTS so that "Clear" and "Start over" wipe the
-# veteran's data without also discarding the operator's API key.
-st.session_state.setdefault("api_key", "")
+# Discard browser-entered credentials retained by sessions from older versions.
+st.session_state.pop("api_key", None)
+st.session_state.pop("w_api_key", None)
 
 # Model selection is split in two: a dropdown choice plus a free-text box used
 # only when "Other" is picked. Keeping them separate means switching away from
@@ -121,8 +121,8 @@ def active_model() -> str:
 
 
 def active_api_key() -> str:
-    """Never seed a browser widget with an app-owned secret."""
-    return st.session_state.api_key.strip() or stored_api_key()
+    """Use only server-side credentials; never expose a key in a browser widget."""
+    return stored_api_key()
 
 
 # ------------------------------------------------------------ state plumbing
@@ -146,7 +146,7 @@ def _sync(name: str) -> None:
     st.session_state[name] = st.session_state[wkey(name)]
     if name == "job_description":
         st.session_state.selected_job = None  # typed over: no longer the listed job
-    if name in FIELDS or name in ("api_key", "model_choice", "custom_model", "consent",
+    if name in FIELDS or name in ("model_choice", "custom_model", "consent",
                                   "transcript_approved"):
         st.session_state.error = ""
     # A work-location preference is not part of the transcript, so editing it
@@ -314,14 +314,6 @@ with st.sidebar:
             unsafe_allow_html=True,
         )
 
-    st.markdown(f'<p class="va-eyebrow">{T["api_key"].upper()}</p>', unsafe_allow_html=True)
-    st.text_input(
-        T["api_key"],
-        type="password",
-        label_visibility="collapsed",
-        **bind("api_key"),
-    )
-
     # Model is a dropdown of names the API listed for this key, with a typed
     # fallback. Availability is per-key and changes, so the list is a
     # convenience, not a guarantee; an unavailable name returns a clear 404.
@@ -348,10 +340,8 @@ with st.sidebar:
     elif st.session_state.model_choice == engine.CUSTOM_MODEL_OPTION:
         st.caption(T["model_custom_note"])
 
-    if not st.session_state.api_key and api_key:
-        st.caption(T["server_key_configured"])
-    else:
-        st.caption("[Google AI Studio →](https://aistudio.google.com/apikey)")
+    if not api_key:
+        st.warning(T["server_key_missing"])
 
     st.button(T["clear"], key="btn_clear", use_container_width=True, on_click=reset_all)
     st.markdown(

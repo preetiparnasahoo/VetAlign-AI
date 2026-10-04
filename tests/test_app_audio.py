@@ -197,21 +197,36 @@ def test_translations_have_matching_keys():
     assert set(STRINGS["English"]) == set(STRINGS["हिन्दी"])
 
 
-def test_server_key_is_used_but_never_seeded_into_browser_widget():
+def test_server_key_is_used_without_browser_credential_input():
     import streamlit
     from test_app_state import FAKE_RESULT
     server_key = "fake-server-secret-for-test"
     with patch.object(type(streamlit.secrets), "get", return_value=server_key):
         at = fill_minimum(run_app())
-        assert at.text_input(key="w_api_key").value == ""
-        assert at.session_state.api_key == ""
+        assert not any(w.key == "w_api_key" for w in at.text_input)
+        # An old session override must no longer be accepted or retained.
+        at.session_state.api_key = "stale-browser-key"
+        at.session_state.w_api_key = "stale-browser-key"
         with patch("career_engine.generate", return_value=FAKE_RESULT) as generate, patch(
             "career_engine.profile_markdown", return_value="# Draft"
         ):
             press_analyse(at)
     assert not at.exception
     assert generate.call_args.args[0] == server_key
+    assert "api_key" not in at.session_state
+    assert "w_api_key" not in at.session_state
     assert server_key not in str(at)
+
+
+def test_missing_server_key_shows_operator_guidance_without_key_input(monkeypatch):
+    import streamlit
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    with patch.object(type(streamlit.secrets), "get", return_value=""):
+        at = run_app()
+    assert not at.exception, at.exception
+    assert not any(w.key == "w_api_key" for w in at.text_input)
+    assert any(STRINGS["English"]["server_key_missing"] in w.value for w in at.warning)
+
 
 def test_spoken_location_fills_field_and_unspoken_keeps_typed_value():
     import copy

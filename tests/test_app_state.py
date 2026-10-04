@@ -257,11 +257,14 @@ def test_language_switch_preserves_answers():
     assert at.session_state.consent is True
 
 
-def test_language_switch_preserves_the_api_key():
+def test_language_switch_keeps_server_key_out_of_widgets():
     at = run_app()
-    at.text_input(key="w_api_key").set_value("test-key-123").run()
+    at.secrets["GEMINI_API_KEY"] = "test-key-123"
     at.button(key="lang_हिन्दी").click().run()
-    assert at.session_state.api_key == "test-key-123"
+    assert not at.exception, at.exception
+    assert at.secrets["GEMINI_API_KEY"] == "test-key-123"
+    assert not any(w.key == "w_api_key" for w in at.text_input)
+    assert "test-key-123" not in str(at)
 
 
 def test_language_switch_on_a_later_step_does_not_lose_results():
@@ -277,13 +280,14 @@ def test_language_switch_on_a_later_step_does_not_lose_results():
 
 def test_clear_wipes_answers_but_keeps_credentials():
     at = run_app()
-    at.text_input(key="w_api_key").set_value("test-key-123").run()
+    at.secrets["GEMINI_API_KEY"] = "test-key-123"
     fill_minimum(at, "Stores duties.")
     at.button(key="btn_clear").click().run()
     assert not at.exception, at.exception
     assert at.session_state.duties == ""
     assert at.session_state.consent is False
-    assert at.session_state.api_key == "test-key-123", "clearing data must not log the operator out"
+    assert at.secrets["GEMINI_API_KEY"] == "test-key-123"
+    assert not any(w.key == "w_api_key" for w in at.text_input)
 
 
 def test_clear_also_empties_the_rendered_widget():

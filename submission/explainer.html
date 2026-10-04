@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>VetAlign-AI — Problem &amp; Solution</title>
+<style>
+body{font-family:Helvetica,Arial,sans-serif;font-size:11pt;color:#12263A;max-width:760px;margin:24px auto;line-height:1.4}
+h1{font-size:20pt;margin:0;color:#0B2447}
+h2{font-size:13pt;color:#0B2447;border-bottom:2px solid #F0A04B;padding-bottom:2px;margin-top:18px}
+.tag{color:#2E7D32;font-weight:bold;margin:2px 0 10px}
+table{border-collapse:collapse;width:100%;font-size:10pt}
+td,th{border:1px solid #c9d2dc;padding:4px 6px;text-align:left;vertical-align:top}
+th{background:#F5F7FA}
+pre{background:#F5F7FA;padding:8px;font-size:9.5pt}
+.fill{background:#FFF3CD}
+.small{font-size:9pt;color:#555}
+</style></head><body>
+
+<h1>VetAlign-AI</h1>
+<p class="tag">सैन्य अनुभव से नागरिक करियर तक · From service experience to a civilian career</p>
+<p class="small">Build for Good · Track 3 — Product Build · Idea #09 Ex-servicemen skill matcher ·
+Live app: <span class="fill">[FILL: https://….streamlit.app]</span></p>
+
+<h2>1. The problem</h2>
+<p>A Havildar retiring after fifteen years has run a battalion's stores and transport and trained
+forty jawans. On a civilian job portal that reads as nothing, because the words do not match:
+recruiters search for <i>inventory management</i>, <i>fleet coordination</i> and <i>team training</i>,
+not <i>stores</i>, <i>convoy</i> and <i>jawans</i>. Most ex-servicemen retire in their late thirties or
+forties and need a second career.
+<span class="fill">[VERIFY a sourced figure before using it, e.g. annual retirements from the
+Directorate General of Resettlement]</span>. Writing a civilian CV means typing in a second
+language, and paid CV writers charge for it. Generic AI writers inflate rank into titles that were never held
+and invent certificates.</p>
+
+<h2>2. Who it helps</h2>
+<p>Retiring and retired Indian Army, Navy and Air Force personnel looking for civilian work,
+especially those more comfortable <b>speaking Hindi than typing English</b>. Secondary users:
+resettlement counsellors and ex-servicemen association volunteers who help them.</p>
+
+<h2>3. The solution</h2>
+<p>The veteran <b>speaks</b> for 30–90 seconds in Hindi or mixed Hindi-English. Three steps later they have a
+civilian profile and up to three matching open roles they can act on today.</p>
+<pre>
+ Voice note (Hindi)  ─►  Gemini: transcript + service, rank, years, trade, work city
+                          (each field must quote the speaker's exact words)
+                     ─►  Veteran reviews, corrects and approves
+                     ─►  Gemini: civilian skills, each cited to a numbered fact,
+                          8-word headline, 3-sentence summary, top-3 job IDs
+                     ─►  App: rejects unknown/closed/uncited jobs; copies employer,
+                          link and contact from the job list (never from the AI)
+                     ─►  Matched roles with reason + gaps · editable profile · download
+</pre>
+
+<h2>4. Why AI is essential</h2>
+<ul>
+<li><b>Hindi speech → structured facts.</b> Gemini transcribes code-switched Hindi and pulls out rank, years
+and trade. It tells "15 साल" (years of service) apart from "40 जवान" (team size), which a form or keyword
+matcher cannot do.</li>
+<li><b>Military → civilian translation.</b> A mapping in the prompt (stores → inventory management,
+convoy → fleet &amp; logistics, training jawans → team training &amp; supervision, guard duty → security
+operations, signals → telecom/IT support) produces specific skills instead of "disciplined, hard-working".</li>
+<li><b>Matching by skills, not titles.</b> A "Havildar" never appears in a job ad. Gemini compares the
+evidenced skills with each role's required skills and explains the fit and the gaps.</li>
+<li><b>Guard-rails in code, not trust.</b> Every skill must cite the veteran's own words. Job IDs not in
+the list, or matches citing no fact, are discarded. A defence licence is never presented as a civilian
+licence.</li>
+</ul>
+
+<h2>5. Test results</h2>
+<table>
+<tr><th>Test</th><th>Input</th><th>Result</th></tr>
+<tr><td>Brief test 1</td><td>Hindi voice note: 15 years, Havildar, stores &amp; transport, trained 40 jawans, Pune
+<i>(synthetic voice, fictional)</i></td>
+<td>Transcript in Devanagari; Army · हवलदार · 15 years; <b>40 kept out of years</b>; education left blank,
+not invented. Matches: Warehouse Supervisor (Pune), Logistics Coordinator (Nagpur, location gap stated)
+<span class="fill">[FILL re-run: 3rd match, time]</span>.</td></tr>
+<tr><td>Brief test 2</td><td>Hindi voice note about signals / radio / line maintenance</td>
+<td class="fill">[FILL: telecom/IT skills and roles shown?]</td></tr>
+<tr><td>Brief test 3</td><td>Silent clip</td>
+<td>Silent WAV is rejected by the server-side check before any AI call (verified offline); the app then
+asks the user to record again. <span class="fill">[FILL: live result in the app, and an unclear/mumbled clip]</span></td></tr>
+<tr><td>Typed sample</td><td>Navy Petty Officer, electrical maintenance</td>
+<td>3 maintenance roles, 7 skills, 23.5 s on Gemini 3.8 Flash; gaps flagged (maintenance software,
+customer-site handling).</td></tr>
+<tr><td>Reliability</td><td>Gemini 3.8 Flash overloaded (HTTP 503)</td>
+<td>Automatic retry, then backup model (3.5 Flash) produced the result and the screen said so.</td></tr>
+</table>
+<p class="small">207 automated offline tests cover consent, grounding, job-ID validation, state handling and
+error paths. All demo people and jobs are fictional; job links use the reserved <code>.invalid</code> domain.</p>
+
+<h2>6. Impact</h2>
+<p><span class="fill">[FILL with measured numbers only, e.g. "A 30-second Hindi voice note became a reviewed
+civilian profile and N matched roles in about M minutes, including review, at ₹0 on the free tier."]</span>
+No typing in English is required to start. <span class="fill">[If a real veteran or counsellor tested it,
+say who (with consent) and what they said. This earns the +5 bonus.]</span></p>
+
+<h2>7. Limits and what breaks</h2>
+<ul>
+<li><b>The job list is small</b> (13 fictional roles). It lives in a <b>Google Sheet</b> a non-technical
+volunteer can edit; employers offer roles through a <b>Google Form</b>, and nothing goes live until the
+volunteer marks it open. Proposed maintainer: an ex-servicemen association volunteer or Zila Sainik Welfare
+Office helper, about 15 minutes a week. Roles not checked for 45 days hide themselves; bad rows are skipped
+with a reason, never breaking the list.</li>
+<li>Free-tier Gemini is sometimes busy; retry + backup model reduce, not remove, failures.</li>
+<li>Marathi voice is not offered yet; real-accent testing is limited.</li>
+<li>Advisory only: it does not certify equivalence or decide eligibility. The veteran reviews every line.</li>
+</ul>
+
+<h2>8. Next step</h2>
+<p>Partner with one ex-servicemen association for real, consented listings and a named list maintainer;
+pilot the employer Google Form with real employers; add Marathi voice; send a weekly digest of new
+roles to registered veterans.</p>
+</body></html>

@@ -1,0 +1,9 @@
+streamlit==1.64.0
+google-genai==2.25.0
+pydantic==2.13.5
+pandas>=2.0
+altair>=5.0
+
+# Development only - not needed to run the app
+pytest>=8.0
+

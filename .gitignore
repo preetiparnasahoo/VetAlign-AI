@@ -1,0 +1,31 @@
+# Environments
+vetalign_ai/
+.venv/
+.venv312/
+venv/
+
+# Secrets - never commit
+.streamlit/secrets.toml
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local notes and competition material
+help/
+.DS_Store
+va.log
+*.log
+
+# Synthetic test recordings (regenerate with macOS say)
+test_audio/
+
+# Local-only: snapshots, downloaded drafts, editor and launcher files
+checkpoints/
+vetalign_application_profile*.txt
+vetalign_profile_and_matches*.txt
+*.code-workspace
+.vscode/
+run_app.command

@@ -51,14 +51,14 @@ def test_open_jobs_are_passed_to_the_engine():
     assert "DEMO-014" in ids and "DEMO-013" not in ids
 
 
-def test_matches_render_with_demo_label_and_apply_link():
+def test_matches_render_with_demo_label_and_contact_without_apply_button():
     at, _ = analysed(dict(FAKE_RESULT, _matches=[MATCH]))
     assert at.session_state.step == 2
     text = " ".join(str(el.value) for el in [*at.markdown, *at.caption])
     assert MATCH["title"] in text and MATCH["employer"] in text
     assert EN["demo_badge"] in text
     assert MATCH["contact"] in text
-    assert any(MATCH["application_url"] in str(el.proto) for el in at.get("link_button"))
+    assert not at.get("link_button")
 
 
 def test_no_matches_shows_honest_message():

@@ -41,6 +41,18 @@ def test_tab_lists_every_open_job_without_analysis():
     assert at.session_state.result is None
 
 
+def test_job_cards_keep_contact_without_apply_buttons():
+    at = run_app()
+    assert not at.exception, at.exception
+    assert any(job.application_url for job in demo_open_jobs())
+    assert not at.get("link_button")
+    text = " ".join(c.value for c in at.caption)
+    for job in demo_open_jobs():
+        if job.contact:
+            assert job.contact in text
+    assert use_buttons(at)
+
+
 def test_search_filters_by_skill_or_title():
     at = run_app()
     at.text_input(key="jobs_query").set_value("driving").run()

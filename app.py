@@ -571,8 +571,6 @@ def render_matches(matches: list[dict]) -> None:
                     )
                 for req in match.get("qualification_requirements", []):
                     st.caption(f'{T["employer_requires"]}: {req}')
-                if match.get("application_url"):
-                    st.link_button(T["apply"], match["application_url"], use_container_width=True)
                 if match.get("contact"):
                     st.caption(f'{T["contact"]}: {match["contact"]}')
                 if match.get("last_checked"):
@@ -824,8 +822,6 @@ def render_jobs_tab() -> None:
                     on_click=use_job,
                     args=(job.job_id,),
                 )
-                if job.application_url:
-                    st.link_button(T["apply"], job.application_url, use_container_width=True)
             if job.required_skills:
                 st.markdown(
                     f'**{T["jobs_required"]}:** ' + ", ".join(job.required_skills)
